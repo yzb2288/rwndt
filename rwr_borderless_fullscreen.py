@@ -2,19 +2,22 @@
 # @Author  : FastClock
 # @Project : https://github.com/yzb2288/RWR_Borderless_Fullscreen_Extension
 
+import os
 import time
 import winsound
-import win32api, win32gui, win32con
+import win32api, win32gui, win32con, win32process
 
 def enum_windows_find_rwr(hwnd, extra):
     window_text = win32gui.GetWindowText(hwnd)
     if "RUNNING WITH RIFLES" in window_text and "RUNNING WITH RIFLES Config" not in window_text: # 过滤掉rwr_config.exe
-        class_name = win32gui.GetClassName(hwnd)
-        if class_name != "SDL_app": # SDL_app是steam启动游戏确认窗口的类名
+        tid, pid = win32process.GetWindowThreadProcessId(hwnd)
+        process_handle = win32api.OpenProcess( win32con.PROCESS_QUERY_INFORMATION | win32con.PROCESS_VM_READ, False, pid)
+        process_exe_path = win32process.GetModuleFileNameEx(process_handle, 0)
+        win32api.CloseHandle(process_handle)
+        if os.path.basename(process_exe_path) == "rwr_game.exe":
             extra.append({
                 "hwnd": hwnd,
-                "window_text": window_text,
-                "class_name": class_name
+                "window_text": window_text
             })
 
 def set_borderless_window(hwnd):
