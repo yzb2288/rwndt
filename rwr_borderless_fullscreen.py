@@ -7,6 +7,9 @@ import time
 import winsound
 import win32api, win32gui, win32con, win32process
 
+TARGET_WINDOW_STYLE = 0xffffffff & (win32con.WS_POPUP | win32con.WS_VISIBLE | win32con.WS_CLIPSIBLINGS | win32con.WS_CLIPCHILDREN | win32con.WS_GROUP | win32con.WS_MINIMIZEBOX)
+TARGET_WINDOW_EXSTYLE = 0xffffffff & (win32con.WS_EX_LEFT | win32con.WS_EX_LTRREADING | win32con.WS_EX_RIGHTSCROLLBAR | win32con.WS_EX_STATICEDGE | win32con.WS_EX_COMPOSITED)
+
 def enum_windows_find_rwr(hwnd, extra):
     window_text = win32gui.GetWindowText(hwnd)
     if "RUNNING WITH RIFLES" in window_text and "RUNNING WITH RIFLES Config" not in window_text: # 过滤掉rwr_config.exe
@@ -22,11 +25,16 @@ def enum_windows_find_rwr(hwnd, extra):
 
 def set_borderless_window(hwnd):
     window_style = win32api.GetWindowLong(hwnd, win32con.GWL_STYLE)
-    if window_style & (win32con.WS_BORDER | win32con.WS_DLGFRAME | win32con.WS_SYSMENU | win32con.WS_THICKFRAME | win32con.WS_MINIMIZEBOX):
-        print("游戏窗口{}默认样式: {}".format(hex(hwnd).replace("0x", "").upper().zfill(8), hex(window_style).replace("0x", "").upper().zfill(8)))
+    window_exstyle = win32api.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
+    if (window_style & TARGET_WINDOW_STYLE ^ TARGET_WINDOW_STYLE) or (window_exstyle & TARGET_WINDOW_EXSTYLE ^ TARGET_WINDOW_EXSTYLE):
+        print("游戏窗口{}默认样式: {}, 拓展样式: {}".format(
+            hex(hwnd).replace("0x", "").upper().zfill(8),
+            hex(window_style).replace("0x", "").upper().zfill(8),
+            hex(window_exstyle).replace("0x", "").upper().zfill(8)
+        ))
         print("设置窗口{}为无边框样式".format(hex(hwnd).replace("0x", "").upper().zfill(8)))
-        window_style &= ~(win32con.WS_BORDER | win32con.WS_DLGFRAME | win32con.WS_SYSMENU | win32con.WS_THICKFRAME | win32con.WS_MINIMIZEBOX)
-        win32api.SetWindowLong(hwnd, win32con.GWL_STYLE, window_style)
+        win32api.SetWindowLong(hwnd, win32con.GWL_STYLE, TARGET_WINDOW_STYLE)
+        win32api.SetWindowLong(hwnd, win32con.GWL_EXSTYLE, TARGET_WINDOW_EXSTYLE)
         return True
     else:
         #print("窗口{}已经是无边框样式, 不修改".format(hex(hwnd).replace("0x", "").upper().zfill(8)))
