@@ -46,6 +46,7 @@ class Ui_ToolWindow(object):
         self.textBrowser = QTextBrowser(ToolWindow)
         self.textBrowser.setObjectName("textBrowser")
         self.textBrowser.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self.textBrowser.setStyleSheet("background-color: #141E28")
 
         self.gridLayout.addWidget(self.textBrowser, 5, 1, 1, 2)
 

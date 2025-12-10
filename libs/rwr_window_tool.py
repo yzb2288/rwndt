@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
+import qdarkstyle
 import xml.etree.ElementTree as ET
 from PySide6.QtGui import QMoveEvent
 from PySide6.QtWidgets import QApplication, QWidget
@@ -13,13 +14,13 @@ from libs.rwr_window_style import RWRWindowStyleManager
 class RWRWindowToolApp(QWidget, Ui_ToolWindow):
     def __init__(self, root_path):
         self.root_path = root_path
-        QApplication.styleHints().setColorScheme(Qt.ColorScheme.Dark)
         self.locale_name = get_user_locale_name()
         self.translator = QTranslator()
         if os.path.exists(os.path.join(self.root_path, f"locales/{self.locale_name}/{self.locale_name}.qm")):
             if self.translator.load(f"{self.locale_name}.qm", directory=os.path.join(self.root_path, f"locales/{self.locale_name}")):
                 QApplication.installTranslator(self.translator)
         super().__init__()
+        self.setStyleSheet(qdarkstyle.load_stylesheet_pyside6())
         self.setupUi(self)
         self.steam_resources = SteamResources()
         self.rwr_install_folder_path = self.steam_resources.get_game_path_from_app_id(270150)
