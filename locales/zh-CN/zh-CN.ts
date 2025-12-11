@@ -4,36 +4,42 @@
 <context>
     <name>ToolWindow</name>
     <message>
-        <location filename="../../libs/rwr_window_tool.py" line="143"/>
-        <source>This tool will not work when the fullscreen setting is enabled! Please adjust the fullscreen setting in RWR Configure.</source>
-        <translation>游戏全屏设置开启时本工具无法使用！请在RWR Configure调整全屏设置。</translation>
+        <location filename="../../libs/rwr_window_tool.py" line="199"/>
+        <source>This tool will not work when the fullscreen setting is enabled! Please adjust the fullscreen setting in RWR Configure, or try double clicking the fullscreen label to auto resolve.</source>
+        <translation>游戏全屏设置开启时本工具无法使用！请在RWR Configure调整全屏设置，或者尝试双击全屏标签自动修复。</translation>
     </message>
     <message>
-        <location filename="../../libs/rwr_window_tool.py" line="154"/>
-        <source>The current resolution setting ({0}x{1}) does not match the resolution of the screen ({2}x{3}) where this widget is on! Please adjust in RWR Configure.</source>
-        <translation>当前游戏的分辨率设置({0}x{1})与本工具窗口所在屏幕分辨率({2}x{3})不一致！建议在RWR Configure中调整分辨率。</translation>
+        <location filename="../../libs/rwr_window_tool.py" line="210"/>
+        <source>The current resolution setting ({0}x{1}) does not match the resolution of the screen ({2}x{3}) where this widget is on! Please adjust in RWR Configure, or try double clicking the resolution label to auto resolve.</source>
+        <translation>当前游戏的分辨率设置({0}x{1})与本工具窗口所在屏幕分辨率({2}x{3})不一致！建议在RWR Configure中调整分辨率，或者尝试双击分辨率标签自动修复。</translation>
     </message>
     <message>
-        <location filename="../../libs/rwr_window_tool.py" line="168"/>
+        <location filename="../../libs/rwr_window_tool.py" line="224"/>
         <source>Start detecting the game hwnd. Please move this tool&apos;s window to the screen where you want the game to run in fullscreen.</source>
         <translation>开始检测游戏窗口hwnd，请将本工具的窗口移动到想要全屏显示游戏的屏幕上。</translation>
     </message>
     <message>
-        <location filename="../../libs/rwr_window_tool.py" line="176"/>
+        <location filename="../../libs/rwr_window_tool.py" line="232"/>
         <source>Start detecting the game hwnd. This tool will disable the maximize and resize functions of the game window and set the title bar to dark mode.</source>
         <translation>开始检测游戏窗口hwnd，本工具将禁用游戏窗口的最大化按钮和边框调整功能，并将标题栏设置成暗色模式。</translation>
     </message>
     <message>
-        <location filename="../../libs/rwr_window_tool.py" line="212"/>
-        <location filename="../../libs/rwr_window_tool.py" line="217"/>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="96"/>
+        <location filename="../../libs/rwr_window_tool.py" line="259"/>
+        <location filename="../../libs/rwr_window_tool.py" line="265"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="97"/>
         <source>Fullscreen: </source>
         <translation>全屏: </translation>
     </message>
     <message>
-        <location filename="../../libs/rwr_window_tool.py" line="224"/>
-        <location filename="../../libs/rwr_window_tool.py" line="228"/>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="97"/>
+        <location filename="../../libs/rwr_window_tool.py" line="269"/>
+        <location filename="../../libs/rwr_window_tool.py" line="284"/>
+        <source>Double click to resolve.</source>
+        <translation>双击修复</translation>
+    </message>
+    <message>
+        <location filename="../../libs/rwr_window_tool.py" line="275"/>
+        <location filename="../../libs/rwr_window_tool.py" line="280"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="98"/>
         <source>Resolution: </source>
         <translation>分辨率: </translation>
     </message>
@@ -64,34 +70,50 @@
         <translation>设置游戏窗口{0}为暗色模式</translation>
     </message>
     <message>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="95"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="96"/>
         <source>RWR Window Tool</source>
         <translation>RWR Window Tool</translation>
     </message>
     <message>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="98"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="99"/>
         <source>Reading game graphics settings...</source>
         <translation>正在读取游戏图像设置...</translation>
     </message>
     <message>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="99"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="100"/>
         <source>Borderless fullscreen</source>
         <translation>无边框全屏化</translation>
     </message>
     <message>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="100"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="101"/>
         <source>Better window</source>
         <translation>更好的窗口化</translation>
     </message>
     <message>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="101"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="102"/>
         <source>RWR Configure</source>
         <translation>RWR Configure</translation>
     </message>
     <message>
-        <location filename="../../libs/ui_rwr_window_tool.py" line="102"/>
+        <location filename="../../libs/ui_rwr_window_tool.py" line="103"/>
         <source>Start RWR</source>
         <translation>RWR启动</translation>
+    </message>
+    <message>
+        <location filename="../../libs/win32_singleton.py" line="18"/>
+        <location filename="../../libs/win32_singleton.py" line="24"/>
+        <source>ERROR</source>
+        <translation>错误</translation>
+    </message>
+    <message>
+        <location filename="../../libs/win32_singleton.py" line="19"/>
+        <source>{0} is already running!</source>
+        <translation>{0}已在运行！</translation>
+    </message>
+    <message>
+        <location filename="../../libs/win32_singleton.py" line="25"/>
+        <source>CreateMutexW failed! GetLastError - {0}</source>
+        <translation>CreateMutexW失败！GetLastError - {0}</translation>
     </message>
 </context>
 </TS>

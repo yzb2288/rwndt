@@ -1,30 +1,23 @@
 # -*- coding: utf-8 -*-
 import os
 import subprocess
-import qdarkstyle
-import xml.etree.ElementTree as ET
 from PySide6.QtGui import QMoveEvent
-from PySide6.QtWidgets import QApplication, QWidget
-from PySide6.QtCore import QCoreApplication, QTranslator, QSettings, QTimer, QThread, Signal, Qt
-from libs.user_locale import get_user_locale_name
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import QCoreApplication, QSettings, QObject, QEvent, QTimer, QThread, Signal, Qt
 from libs.steam_resources import SteamResources
 from libs.ui_rwr_window_tool import Ui_ToolWindow
 from libs.rwr_window_style import RWRWindowStyleManager
+from libs.rwr_config import RWRConfigManager
 
 class RWRWindowToolApp(QWidget, Ui_ToolWindow):
     def __init__(self, root_path):
         self.root_path = root_path
-        self.locale_name = get_user_locale_name()
-        self.translator = QTranslator()
-        if os.path.exists(os.path.join(self.root_path, f"locales/{self.locale_name}/{self.locale_name}.qm")):
-            if self.translator.load(f"{self.locale_name}.qm", directory=os.path.join(self.root_path, f"locales/{self.locale_name}")):
-                QApplication.installTranslator(self.translator)
         super().__init__()
-        self.setStyleSheet(qdarkstyle.load_stylesheet_pyside6())
         self.setupUi(self)
         self.steam_resources = SteamResources()
         self.rwr_install_folder_path = self.steam_resources.get_game_path_from_app_id(270150)
         self.rwr_appdata_folder_path = os.path.join(os.getenv("APPDATA"), "Running with rifles")
+        self.rwr_config_manager = RWRConfigManager(self.rwr_appdata_folder_path)
         self.fullscreen = None
         self.resolution_width = None
         self.resolution_height = None
@@ -42,6 +35,8 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
         self.borderlessRadioButton.toggled.connect(self.settings_change_event)
         self.rwrConfigureButton.clicked.connect(self.start_rwr_configure)
         self.rwrStartButton.clicked.connect(self.start_rwr_game)
+        self.fullscreenLabel.installEventFilter(self)
+        self.resolutionLabel.installEventFilter(self)
         self.refresh_ui_timer = QTimer(self, singleShot=False, interval=3000)
         self.refresh_ui_timer.timeout.connect(self.refresh_ui)
         self.refresh_ui_timer.timeout.emit()
@@ -59,7 +54,7 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
         os.startfile("steam://rungameid/270150/")
     
     def refresh_ui(self):
-        self.read_rwr_config()
+        self.get_rwr_config()
         self.check_suitable_resolution(self.resolution_width, self.resolution_height)
         self.update_fullscreen_label(self.fullscreen)
         self.update_resolution_label(self.resolution_width, self.resolution_height)
@@ -128,6 +123,66 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
             self.settings_change_event()
             self.last_screen = self.screen()
     
+    def eventFilter(self, watched:QObject, event:QEvent):
+        if watched == self.fullscreenLabel:
+            if event.type() == QEvent.Type.HoverEnter:
+                if self.fullscreen != None and self.fullscreen != "0":
+                    self.fullscreenLabel.setStyleSheet("background-color: #343E48")
+                else:
+                    self.fullscreenLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.MouseButtonPress:
+                if self.fullscreen != None and self.fullscreen != "0":
+                    if event.button() == Qt.MouseButton.LeftButton:
+                        self.fullscreenLabel.setStyleSheet("background-color: #141E28")
+                else:
+                    self.fullscreenLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.MouseButtonRelease:
+                if self.fullscreen != None and self.fullscreen != "0":
+                    if event.button() == Qt.MouseButton.LeftButton:
+                        self.fullscreenLabel.setStyleSheet("background-color: #343E48")
+                else:
+                    self.fullscreenLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.MouseButtonDblClick:
+                if self.fullscreen != None and self.fullscreen != "0":
+                    if event.button() == Qt.MouseButton.LeftButton:
+                        self.fullscreenLabel.setStyleSheet("background-color: #141E28")
+                        self.rwr_config_manager.set_fullscreen(False)
+                        self.settings_change_event()
+                else:
+                    self.fullscreenLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.HoverLeave:
+                self.fullscreenLabel.setStyleSheet("background-color: none")
+        elif watched == self.resolutionLabel:
+            if event.type() == QEvent.Type.HoverEnter:
+                if not self.suitable_resolution_flag:
+                    self.resolutionLabel.setStyleSheet("background-color: #343E48")
+                else:
+                    self.resolutionLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.MouseButtonPress:
+                if not self.suitable_resolution_flag:
+                    if event.button() == Qt.MouseButton.LeftButton:
+                        self.resolutionLabel.setStyleSheet("background-color: #141E28")
+                else:
+                    self.resolutionLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.MouseButtonRelease:
+                if not self.suitable_resolution_flag:
+                    if event.button() == Qt.MouseButton.LeftButton:
+                        self.resolutionLabel.setStyleSheet("background-color: #343E48")
+                else:
+                    self.resolutionLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.MouseButtonDblClick:
+                if not self.suitable_resolution_flag:
+                    if event.button() == Qt.MouseButton.LeftButton:
+                        screen_resolution = self.screen().size() * self.screen().devicePixelRatio()
+                        self.rwr_config_manager.set_resolution(screen_resolution.width(), screen_resolution.height())
+                        self.settings_change_event()
+                else:
+                    self.resolutionLabel.setStyleSheet("background-color: none")
+            elif event.type() == QEvent.Type.HoverLeave:
+                self.resolutionLabel.setStyleSheet("background-color: none")
+        
+        return super().eventFilter(watched, event)
+    
     def closeEvent(self, event):
         self.save_settings()
         super().closeEvent(event)
@@ -143,7 +198,7 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
                 "<font color=#FF0000>" +
                 QCoreApplication.translate(
                     "ToolWindow",
-                    "This tool will not work when the fullscreen setting is enabled! Please adjust the fullscreen setting in RWR Configure.",
+                    "This tool will not work when the fullscreen setting is enabled! Please adjust the fullscreen setting in RWR Configure, or try double clicking the fullscreen label to auto resolve.",
                     None
                 ) +
                 "</font>"
@@ -154,7 +209,7 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
                 "<font color=#FFFF00>" +
                 QCoreApplication.translate(
                     "ToolWindow",
-                    "The current resolution setting ({0}x{1}) does not match the resolution of the screen ({2}x{3}) where this widget is on! Please adjust in RWR Configure.",
+                    "The current resolution setting ({0}x{1}) does not match the resolution of the screen ({2}x{3}) where this widget is on! Please adjust in RWR Configure, or try double clicking the resolution label to auto resolve.",
                     None
                 ).format(
                     self.resolution_width,
@@ -185,19 +240,10 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
         self.textBrowser.setTextColor(Qt.GlobalColor.white)
         self.textBrowser.append(text)
     
-    def read_rwr_config(self):
-        tree = ET.parse(os.path.join(self.rwr_appdata_folder_path, "config.xml"))
-        fullscreen = tree.find("./fullscreen").get("value")
-        video_mode = tree.find("./videomode").text.strip()
-        resolution_width = int(video_mode.split(" x ")[0])
-        resolution_height = int(video_mode.split(" x ")[1].split()[0])
-        if self.fullscreen != fullscreen or\
-            self.resolution_width != resolution_width or\
-            self.resolution_height != resolution_height:
-            self.reset_flag = True
-        self.fullscreen = fullscreen
-        self.resolution_width = resolution_width
-        self.resolution_height = resolution_height
+    def get_rwr_config(self):
+        self.rwr_config_manager.read_rwr_config()
+        self.fullscreen = self.rwr_config_manager.get_fullscreen()
+        self.resolution_width, self.resolution_height = self.rwr_config_manager.get_resolution()
     
     def check_suitable_resolution(self, width, height):
         if self.borderlessRadioButton.isChecked():
@@ -213,10 +259,14 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
                 QCoreApplication.translate("ToolWindow", "Fullscreen: ", None) +
                 "<font color=#FFFFFF>NO</font>"
             )
+            self.fullscreenLabel.setToolTip("")
         else:
             self.fullscreenLabel.setText(
                 QCoreApplication.translate("ToolWindow", "Fullscreen: ", None) +
                 "<font color=#FF0000>YES</font>"
+            )
+            self.fullscreenLabel.setToolTip(
+                QCoreApplication.translate("ToolWindow", "Double click to resolve.", None)
             )
     
     def update_resolution_label(self, width, height):
@@ -224,10 +274,14 @@ class RWRWindowToolApp(QWidget, Ui_ToolWindow):
             self.resolutionLabel.setText(
                 QCoreApplication.translate("ToolWindow", "Resolution: ", None) + f"{width}x{height}"
             )
+            self.resolutionLabel.setToolTip("")
         else:
             self.resolutionLabel.setText(
                 QCoreApplication.translate("ToolWindow", "Resolution: ", None) +
                 f"<font color=#FFFF00>{width}x{height}</font>"
+            )
+            self.resolutionLabel.setToolTip(
+                QCoreApplication.translate("ToolWindow", "Double click to resolve.", None)
             )
 
 class RWRConfigureSubprocess(QThread):
