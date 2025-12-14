@@ -31,7 +31,7 @@ In better window mode, the tool will disable the maximize and resize functions o
 ```
 git clone https://github.com/yzb2288/rwndt.git
 cd rwndt
-pip install PySide6 pywin32 vdf qdarkstyle
+pip install PySide6 pywin32 vdf qdarkstyle lxml
 python main.py
 ```
 
